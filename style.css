@@ -1,0 +1,396 @@
+/* SŁOWIANIE - Stylistyka średniowieczno-słowiańska RTS */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=VT323&family=MedievalSharp&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #12100e;
+  font-family: 'MedievalSharp', 'Cinzel', serif;
+  color: #eedcc0;
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+#game-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: crosshair;
+}
+
+/* --- EKRANY MENU I MODALE --- */
+
+.menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(28, 20, 14, 0.88) 0%, rgba(10, 7, 5, 0.98) 100%);
+  z-index: 100;
+}
+
+.menu-box {
+  background: linear-gradient(180deg, #3d2716 0%, #24160c 100%);
+  border: 4px solid #82562d;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  padding: 30px 45px;
+  text-align: center;
+  min-width: 420px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.game-logo-title {
+  font-family: 'Cinzel', serif;
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 3px 3px 0 #5c1800, 0 0 20px rgba(255, 170, 0, 0.6);
+  letter-spacing: 4px;
+  margin-bottom: 5px;
+}
+
+.game-subtitle {
+  font-size: 1.1rem;
+  color: #d1b48c;
+  margin-bottom: 25px;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.menu-buttons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.btn-wood {
+  background: linear-gradient(180deg, #6e4624 0%, #472b14 100%);
+  border: 2px solid #a87948;
+  border-radius: 4px;
+  color: #fff2d6;
+  font-family: 'MedievalSharp', serif;
+  font-size: 1.2rem;
+  padding: 12px 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+  transition: all 0.15s ease;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.btn-wood:hover {
+  background: linear-gradient(180deg, #8a572d 0%, #573519 100%);
+  border-color: #ffd700;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 215, 0, 0.2);
+}
+
+.btn-wood:active {
+  transform: translateY(1px);
+}
+
+.btn-back {
+  background: #362214;
+  border-color: #5c3c24;
+  margin-top: 15px;
+}
+
+/* --- HUD W GRZE (TOP BAR & BOTTOM PANEL) --- */
+
+#game-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 50;
+}
+
+/* GÓRNY PASEK SUROWCÓW */
+.top-resource-bar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(38, 24, 14, 0.95) 0%, rgba(20, 12, 7, 0.85) 100%);
+  border-bottom: 3px solid #6b4324;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+  padding: 6px 20px;
+  height: 42px;
+}
+
+.resources-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.res-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.res-milk { color: #ffffff; }
+.res-wood { color: #d4a373; }
+.res-gold { color: #ffd700; }
+.res-faith { color: #5ce1e6; }
+.res-pop { color: #a3e635; }
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#hud-game-time {
+  font-family: 'VT323', monospace;
+  font-size: 1.4rem;
+  color: #e2d4c0;
+}
+
+.btn-icon {
+  background: #472b14;
+  border: 1px solid #82562d;
+  color: #ffd700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* DOLNY PANEL KONTROLNY (HUD BOTTOM) */
+.bottom-control-panel {
+  pointer-events: auto;
+  display: flex;
+  background: linear-gradient(180deg, rgba(41, 26, 15, 0.98) 0%, rgba(20, 12, 7, 1) 100%);
+  border-top: 3px solid #82562d;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.9);
+  height: 170px;
+  padding: 5px 10px;
+  gap: 12px;
+}
+
+/* MINIMAPA */
+.minimap-wrapper {
+  width: 160px;
+  height: 160px;
+  border: 2px solid #6b4324;
+  background: #000;
+  position: relative;
+  flex-shrink: 0;
+}
+
+#minimap-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+/* PANEL SELEKCJI I STATYSTYK */
+.selection-wrapper {
+  flex: 1;
+  border: 2px solid #57381d;
+  background: rgba(18, 11, 6, 0.85);
+  border-radius: 4px;
+  padding: 8px 14px;
+  overflow-y: auto;
+}
+
+.sel-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #57381d;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+.sel-name {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.hp-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: #2b180d;
+  border: 1px solid #000;
+  margin-bottom: 4px;
+  border-radius: 2px;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  transition: width 0.1s;
+}
+
+.hp-text {
+  font-size: 0.85rem;
+  color: #d1b48c;
+  margin-bottom: 6px;
+}
+
+.sel-stat {
+  font-size: 0.95rem;
+  color: #eedcc0;
+  margin-top: 2px;
+}
+
+/* PANEL ROZKAZÓW I PRZYCISKÓW (COMMAND CARD) */
+.command-card-wrapper {
+  width: 320px;
+  border: 2px solid #57381d;
+  background: rgba(18, 11, 6, 0.85);
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.cmd-section-title {
+  font-size: 0.9rem;
+  color: #ffd700;
+  margin-bottom: 6px;
+}
+
+.cmd-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.cmd-btn {
+  background: linear-gradient(180deg, #523419 0%, #331e0c 100%);
+  border: 1px solid #784e26;
+  border-radius: 4px;
+  color: #fff;
+  padding: 6px 4px;
+  font-size: 0.85rem;
+  font-family: 'MedievalSharp', serif;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.cmd-btn:hover:not(.disabled) {
+  background: linear-gradient(180deg, #784e26 0%, #472911 100%);
+  border-color: #ffd700;
+}
+
+.cmd-btn.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(80%);
+}
+
+.cmd-btn-cost {
+  font-size: 0.75rem;
+  color: #ffd700;
+  margin-top: 2px;
+}
+
+/* DIALOGI KAMPANII */
+#campaign-dialog-box {
+  pointer-events: auto;
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(28, 18, 10, 0.95);
+  border: 3px solid #82562d;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: none;
+  align-items: center;
+  gap: 15px;
+  max-width: 600px;
+}
+
+.dialog-avatar {
+  font-size: 2.2rem;
+  background: #3b2413;
+  border: 2px solid #a87948;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-speaker {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ffd700;
+  margin-bottom: 4px;
+}
+
+.dialog-text {
+  font-size: 0.95rem;
+  color: #fff;
+  line-height: 1.3;
+}
+
+/* EDYTOR MAPY / AI */
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.editor-textarea {
+  width: 100%;
+  height: 340px;
+  background: #1a1410;
+  border: 2px solid #57381d;
+  color: #42f57e;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.95rem;
+  padding: 10px;
+  resize: vertical;
+  border-radius: 4px;
+}

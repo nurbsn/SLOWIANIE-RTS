@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SŁOWIANIE - Silnik RTS 2D (Polanie 1996 Tribute)</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- PeerJS dla bezpośrednich połączeń WebRTC P2P Multiplayer -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Główny Canvas gry RTS -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD W GRZE -->
+    <div id="game-hud">
+      <!-- Górny pasek surowców -->
+      <div class="top-resource-bar">
+        <div class="resources-group">
+          <div class="res-item res-milk" title="Mleko (zebrane z krów)">🥛 <span id="res-milk">0</span></div>
+          <div class="res-item res-wood" title="Drewno (wycięte z lasu)">🪵 <span id="res-wood">0</span></div>
+          <div class="res-item res-gold" title="Złoto / Kruszec (ze złóż)">🪙 <span id="res-gold">0</span></div>
+          <div class="res-item res-faith" title="Wiara / Moc bogów (ze świątyń)">✨ <span id="res-faith">0</span></div>
+          <div class="res-item res-pop" title="Populacja">👥 <span id="res-pop">0/10</span></div>
+        </div>
+        <div class="top-bar-right">
+          <span id="hud-game-time">00:00</span>
+          <button class="btn-icon" id="btn-pause-game" title="Pauza / Menu (F10 / Esc)">⚙️</button>
+        </div>
+      </div>
+
+      <!-- Okno dialogowe fabuły kampanii -->
+      <div id="campaign-dialog-box"></div>
+
+      <!-- Dolny panel kontrolny (Minimapa, Selekcja, Rozkazy) -->
+      <div class="bottom-control-panel">
+        <div class="minimap-wrapper">
+          <canvas id="minimap-canvas"></canvas>
+        </div>
+        <div class="selection-wrapper" id="selection-info">
+          <div class="empty-sel">Wybierz jednostkę lub budynek</div>
+        </div>
+        <div class="command-card-wrapper" id="command-card">
+          <!-- Przyciski budowy, czarów i akcji renderowane dynamicznie -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. MENU GŁÓWNE -->
+    <div id="main-menu" class="menu-overlay">
+      <div class="menu-box">
+        <h1 class="game-logo-title">SŁOWIANIE</h1>
+        <p class="game-subtitle">2D RTS Engine &bull; Hołd dla gry Polanie (1996)</p>
+        <div class="menu-buttons-list">
+          <button class="btn-wood" id="btn-menu-campaign">🛡️ Kampania Fabularna</button>
+          <button class="btn-wood" id="btn-menu-skirmish">⚔️ Potyczka (Skirmish AI)</button>
+          <button class="btn-wood" id="btn-menu-multiplayer">🌐 Gra Wieloosobowa (PeerJS / Matrix)</button>
+          <button class="btn-wood" id="btn-menu-map-editor">🗺️ Edytor Map</button>
+          <button class="btn-wood" id="btn-menu-campaign-editor">📜 Edytor Kampanii</button>
+          <button class="btn-wood" id="btn-menu-ai-editor">🧠 Studio Skryptów AI</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MENU POTYCZKI (SKIRMISH) -->
+    <div id="skirmish-menu" class="menu-overlay" style="display: none;">
+      <div class="menu-box">
+        <h2>⚔️ Potyczka z Botem AI</h2>
+        <div style="margin: 20px 0; text-align: left;">
+          <label style="display: block; margin-bottom: 8px;">Poziom i Styl Bota AI:</label>
+          <select id="skirmish-ai-diff" style="width: 100%; padding: 8px; font-size: 1rem; margin-bottom: 15px; background: #2b1a0e; color: #fff; border: 1px solid #82562d;">
+            <option value="BALANCED">Zrównoważony Słowianin (Normalny)</option>
+            <option value="AGGRESSIVE">Wojowniczy Wódz - Rasz (Trudny)</option>
+            <option value="PRIEST_MAGIC">Żerca Świętego Gaju - Magia (Trudny)</option>
+            <option value="TURTLE">Obrońca Grodu - Twierdza (Średni)</option>
+          </select>
+
+          <label style="display: block; margin-bottom: 8px;">Rozmiar Mapy:</label>
+          <select id="skirmish-map-size" style="width: 100%; padding: 8px; font-size: 1rem; margin-bottom: 20px; background: #2b1a0e; color: #fff; border: 1px solid #82562d;">
+            <option value="48">Mała (48x48) - Szybka potyczka</option>
+            <option value="64" selected>Średnia (64x64) - Standardowa</option>
+            <option value="80">Wielka (80x80) - Długa bitwa</option>
+          </select>
+        </div>
+        <button class="btn-wood" id="btn-start-skirmish">Rozpocznij Bitwę!</button>
+        <button class="btn-wood btn-back btn-back-main">Wróć</button>
+      </div>
+    </div>
+
+    <!-- 3. MENU KAMPANII -->
+    <div id="campaign-menu" class="menu-overlay" style="display: none;">
+      <div class="menu-box" style="min-width: 550px;">
+        <h2>🛡️ Kampania: Zjednoczenie Plemion Słowian</h2>
+        <div style="margin: 20px 0; text-align: left;">
+          <label style="display: block; margin-bottom: 8px;">Wybierz Misję:</label>
+          <select id="campaign-mission-select" style="width: 100%; padding: 8px; font-size: 1rem; margin-bottom: 15px; background: #2b1a0e; color: #fff; border: 1px solid #82562d;">
+          </select>
+          <div id="campaign-briefing-text" style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 4px; border: 1px solid #57381d; line-height: 1.4;"></div>
+        </div>
+        <button class="btn-wood" id="btn-start-mission">Wyrusz na Misję!</button>
+        <button class="btn-wood btn-back btn-back-main">Wróć</button>
+      </div>
+    </div>
+
+    <!-- 4. MENU MULTIPLAYER (PEERJS + MATRIX) -->
+    <div id="multiplayer-menu" class="menu-overlay" style="display: none;">
+      <div class="menu-box" style="min-width: 600px;">
+        <h2>🌐 Rozgrywka Wieloosobowa P2P &bull; Matrix Lobby</h2>
+        <div style="margin: 20px 0; text-align: left;">
+          <label style="display: block; margin-bottom: 4px;">Twój Pseudonim Wodza:</label>
+          <input type="text" id="mp-player-name" value="Kniaź_Mieszko" style="width: 100%; padding: 8px; margin-bottom: 15px; background: #1c130b; color: #ffd700; border: 1px solid #82562d; font-size: 1rem;">
+
+          <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+            <div style="flex: 1; border: 1px solid #57381d; padding: 12px; border-radius: 4px; background: rgba(0,0,0,0.3);">
+              <h4>Stwórz Nowy Pokój (Host)</h4>
+              <button class="btn-wood" id="btn-host-multiplayer" style="width: 100%; margin-top: 10px;">Załóż Gród</button>
+              <div id="mp-host-code-display" style="margin-top: 8px; font-size: 0.85rem; color: #42f57e;"></div>
+            </div>
+
+            <div style="flex: 1; border: 1px solid #57381d; padding: 12px; border-radius: 4px; background: rgba(0,0,0,0.3);">
+              <h4>Dołącz do Pokoju</h4>
+              <input type="text" id="mp-join-peer-id" placeholder="Wpisz PeerID lub Kod..." style="width: 100%; padding: 8px; margin-top: 8px; background: #1c130b; color: #fff; border: 1px solid #82562d;">
+              <button class="btn-wood" id="btn-join-multiplayer" style="width: 100%; margin-top: 8px;">Dołącz</button>
+            </div>
+          </div>
+
+          <h4>Aktywni Gracze w Lobby:</h4>
+          <div id="mp-lobby-player-list" style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; margin-top: 6px; min-height: 50px;">
+            <div>Oczekiwanie na graczy...</div>
+          </div>
+        </div>
+        <button class="btn-wood" id="btn-mp-start-game" style="margin-top: 10px;">Rozpocznij Grę Multiplayer</button>
+        <button class="btn-wood btn-back btn-back-main">Wróć</button>
+      </div>
+    </div>
+
+    <!-- 5. MENU EDYTORA MAP -->
+    <div id="map-editor-menu" class="menu-overlay" style="display: none;">
+      <div class="menu-box" style="min-width: 650px;">
+        <h2>🗺️ Edytor Map i Terenu</h2>
+        <p style="margin-bottom: 15px; color: #d1b48c;">Maluj rzeki, lasy, złoża złota, stada krów i stawiaj budynki bezpośrednio na żywej mapie.</p>
+        <div class="editor-toolbar">
+          <button class="btn-wood" onclick="window.gameEngine.mapEditor.currentTool='tile'; window.gameEngine.mapEditor.selectedTileType=0;">🌿 Trawa</button>
+          <button class="btn-wood" onclick="window.gameEngine.mapEditor.currentTool='tile'; window.gameEngine.mapEditor.selectedTileType=4;">🌲 Las</button>
+          <button class="btn-wood" onclick="window.gameEngine.mapEditor.currentTool='tile'; window.gameEngine.mapEditor.selectedTileType=2;">🌊 Woda</button>
+          <button class="btn-wood" onclick="window.gameEngine.mapEditor.currentTool='tile'; window.gameEngine.mapEditor.selectedTileType=6;">🪙 Złoto</button>
+          <button class="btn-wood" onclick="window.gameEngine.mapEditor.currentTool='entity'; window.gameEngine.mapEditor.selectedEntityType='krowa';">🐄 Krowa</button>
+          <button class="btn-wood" onclick="window.gameEngine.mapEditor.currentTool='building'; window.gameEngine.mapEditor.selectedBuildingType='grod';">🏰 Gród</button>
+          <button class="btn-wood" onclick="window.gameEngine.mapEditor.currentTool='erase';">🧹 Usuń</button>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+          <button class="btn-wood" id="btn-editor-playtest">🎮 Przetestuj Mapę</button>
+          <button class="btn-wood" id="btn-editor-export">💾 Eksportuj JSON</button>
+          <button class="btn-wood btn-back btn-back-main">Wróć do Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. MENU EDYTORA KAMPANII -->
+    <div id="campaign-editor-menu" class="menu-overlay" style="display: none;">
+      <div class="menu-box" style="min-width: 650px;">
+        <h2>📜 Kreator Kampanii i Misji Fabularnych</h2>
+        <p style="margin-bottom: 15px; color: #d1b48c;">Twórz własne sagi, dialogi postaci, warunki zwycięstwa i posiłki skryptowane.</p>
+        <button class="btn-wood" onclick="alert('Nowa misja dodana do drzewka kampanii!');">➕ Dodaj Nową Misję</button>
+        <button class="btn-wood btn-back btn-back-main" style="margin-top: 20px;">Wróć</button>
+      </div>
+    </div>
+
+    <!-- 7. STUDIO SKRYPTÓW AI -->
+    <div id="ai-editor-menu" class="menu-overlay" style="display: none;">
+      <div class="menu-box" style="min-width: 750px;">
+        <h2>🧠 Studio Skryptów i Reguł AI</h2>
+        <p style="margin-bottom: 10px; color: #d1b48c;">Pisz w czasie rzeczywistym kod taktyczny dla jednostek i makro-strategii botów:</p>
+        <textarea id="ai-script-textarea" class="editor-textarea"></textarea>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+          <button class="btn-wood" id="btn-ai-test-syntax">✔️ Sprawdź Składnię</button>
+          <button class="btn-wood" id="btn-ai-apply">🚀 Wgraj do Gry</button>
+          <button class="btn-wood btn-back btn-back-main">Wróć</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL PAUZY -->
+    <div id="pause-modal" class="menu-overlay" style="display: none;">
+      <div class="menu-box" style="min-width: 380px;">
+        <h2>Pauza</h2>
+        <div style="margin: 20px 0; text-align: left;">
+          <label style="display: block; margin-bottom: 6px;">Głośność Efektów (SFX):</label>
+          <input type="range" id="slider-sfx-volume" min="0" max="1" step="0.05" value="0.6" style="width: 100%; margin-bottom: 15px;">
+
+          <label style="display: block; margin-bottom: 6px;">Głośność Muzyki Słowiańskiej:</label>
+          <input type="range" id="slider-music-volume" min="0" max="1" step="0.05" value="0.35" style="width: 100%;">
+        </div>
+        <button class="btn-wood" id="btn-resume-game">Wznów Bitwę</button>
+        <button class="btn-wood btn-back" id="btn-quit-match">Poddaj się / Wyjdź</button>
+      </div>
+    </div>
+
+    <!-- MODAL KONIEC GRY (ZWYCIĘSTWO / PORAŻKA) -->
+    <div id="game-over-modal" class="menu-overlay" style="display: none;"></div>
+  </div>
+
+  <!-- Główny punkt startowy aplikacji ES6 -->
+  <script type="module">
+    import { GameEngine } from './src/core/GameEngine.js';
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const canvas = document.getElementById('game-canvas');
+      const engine = new GameEngine();
+      window.gameEngine = engine; // Dostęp do konsoli developerskiej
+      await engine.init(canvas);
+    });
+  </script>
+</body>
+</html>
