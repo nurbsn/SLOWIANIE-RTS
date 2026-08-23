@@ -1,5 +1,9 @@
 # Stan Projektu: SŁOWIANIE (Silnik RTS 2D w JS/HTML)
 
+*Data ostatniej aktualizacji: 2026-08-23*
+
+---
+
 ## 📌 Podsumowanie Projektu
 Projekt **SŁOWIANIE** to kompletny, autonomiczny i modularny silnik strategicznej gry czasu rzeczywistego (RTS 2D) w czystym HTML5 / JavaScript (ES6 Modules), stworzony w hołdzie dla kultowej polskiej gry **Polanie** (1996).
 
@@ -8,80 +12,55 @@ Kod źródłowy projektu został pomyślnie opublikowany w repozytorium GitHub:
 
 ---
 
-## 🚀 Zrealizowane Funkcjonalności
+## 🚀 Ostatnie Zmiany i Stan Bieżący
 
-### 1. Mechanika Rozgrywki (Inspirowana grą Polanie)
-- **Unikalny model ekonomiczny**:
-  - **Mleko (🥛)**: Krowy pasą się na zielonych łąkach, wyjadając soczystą trawę do stanu wypasionej murawy (która z czasem regeneruje się i odrasta). Mleko zbierają Kmiecie lub jest ono dostarczane wprost z Obory. Mleko stanowi podstawowy surowiec żywnościowy i rekrutacyjny.
-  - **Drewno (🪵)**: Kmiecie wycinają drzewa z puszczy i znoszą kłody do Grodu lub Chaty Drwala. Po wycięciu drzew pole staje się wolnym terenem.
-  - **Złoto / Kruszec (🪙)**: Wydobywane ze złóż skalnych, potrzebne do opancerzenia, konnicy i kapłanów.
-  - **Wiara (✨)**: Generowana przez Świątynie Światowida i modlitwy Żerców, wykorzystywana do potężnych zaklęć bóstw słowiańskich.
-- **Jednostki**:
-  - `Krowa` (pasie się, daje mleko, wędruje po pastwiskach),
-  - `Kmieć` (buduje, naprawia, rąbie drewno, doi krowy, wydobywa złoto),
-  - `Woj Tarczownik` (piechota z mieczem i tarczą),
-  - `Łucznik` (walka dystansowa z łukiem),
-  - `Konny Wojownik` (szybka jazda o potężnym uderzeniu),
-  - `Kapłan / Żerca` (rzuca czary: Grom Peruna, Błogosławieństwo Swaroga, Zew Watahy z wilkami, Gniew Światowida),
-  - `Wilk` (dzika bestia / przywołaniec).
-- **Budynki**:
-  - `Gród (Ratusz)`, `Chata Drwala`, `Obora dla Krów`, `Chata Wojów (Koszary)`, `Świątynia Światowida`, `Wieża Strażnicza (automatyczny ostrzał)`, `Palisada`.
-- **Systemy Świata**:
-  - Dwupoziomowa mgła wojny (*Fog of War* - nieodkryte / odkryte / w polu widzenia).
-  - Nawigacja i A* Pathfinding z ruchem po skosie i omijaniem przeszkód.
-  - Kamera z płynnym powiększaniem (zoom), przewijaniem brzegowym i mini-mapą.
-  - Efekty cząsteczkowe (krew, wióry drewna, dym, kręgi zaklęć, unoszący się tekst obrażeń i zbiorów).
+1. **Architektura Silnika RTS 2D**:
+   - Pętla gry z deterministycznym taktowaniem symulacji (`20 TPS`) i płynnym renderowaniem `requestAnimationFrame`.
+   - Zintegrowana kamera 2D z obsługą powiększania (zoom), przewijania brzegowego i mini-mapą ze współrzędnymi radaru.
+   - Płynny algorytm nawigacji **A* Pathfinding** z omijaniem przeszkód i ruchem po przekątnych.
+   - Dwupoziomowa mgła wojny (**Fog of War**: nieodkryty teren, widok terenu poza zasięgiem wzroku, pole aktywnego widzenia jednostek/budynków).
 
-### 2. Dźwięk i Muzyka (Web Audio API)
-- Proceduralna synteza dźwięków walki, rąbania lasu, ryku krów, czarów gromowych i potwierdzeń rozkazów.
-- Generator proceduralnej, folkowej muzyki słowiańskiej w skali modalnej bez potrzeby zewnętrznych plików mp3.
+2. **Mechanika Ekonomii i Walki (Klimat Gry Polanie)**:
+   - **Mleko (🥛)**: Krowy pasą się na zielonych łąkach, zjadają trawę i przeżuwają (trawa staje się wyjedzona i regeneruje się z czasem). Kmiecie doją krowy i znoszą mleko do Grodu lub Obory. Mleko jest głównym surowcem rekrutacyjnym i żywnościowym.
+   - **Drewno (🪵)**: Pozyskiwane przez wycinkę puszczy; ścięte drzewa odsłaniają wolny teren.
+   - **Złoto / Kruszec (🪙)**: Wydobycie ze złóż skalnych na konnicę i zaawansowany pancerz.
+   - **Wiara (✨)**: Generowana przez Świątynie Światowida i modlitwy Żerców.
+   - **Jednostki**: Krowa, Kmieć, Wojownik Tarczownik, Łucznik, Konny Wojownik, Kapłan / Żerca, Dziki Wilk.
+   - **Budynki**: Gród (Ratusz), Chata Drwala, Obora, Koszary, Świątynia, Wieża Strażnicza (automatyczny ostrzał), Palisada.
+   - **Czary Pogańskie**: *Grom Peruna*, *Błogosławieństwo Swaroga*, *Zew Watahy*, *Gniew Światowida*.
 
-### 3. Grafika Pixel Art (AssetManager)
-- W pełni algorytmicznie generowane tekstury i sprajty pixel art w pamięci Canvas:
-  - 9 rodzajów kafelków terenu (trawa, wypasiona trawa, woda, głęboka woda, las, skały, złoto, błoto, trakty),
-  - Pełny zestaw budynków i jednostek w barwach 4 graczy.
+3. **Autonomiczne Dźwięki i Pixel Art**:
+   - **Proceduralny Pixel Art Renderer** w `AssetManager.js` – 9 rodzajów kafelków, pełny zestaw budynków i jednostek dla 4 kolorów graczy.
+   - **Synteza Web Audio API** w `SoundSystem.js` – proceduralne efekty bitewne, rąbanie drewna, muczenie krów i słowiańska muzyka folkowa bez zewnętrznych plików mp3.
 
-### 4. Multiplayer P2P i Lobby Matrix
-- Integracja z **PeerJS** do bezpośredniej synchronizacji rozkazów graczy przez WebRTC bez dedykowanego serwera.
-- Moduł **MatrixLobby** do ogłaszania i odkrywania otwartych sesji w zdecentralizowanej sieci Matrix.
-- Kody pokoi i natychmiastowe dołączanie po identyfikatorze.
+4. **Tryby Rozgrywki i Edytory**:
+   - **Kampania Fabularna**: 3 pełne misje (*Przebudzenie w Puszczy*, *Obrona Świętego Gaju*, *Bitwa o Gród Główny*) z dialogami i celami.
+   - **Potyczka (Skirmish AI)**: bot o 4 profilach taktycznych (*Zrównoważony, Rasz/Agresor, Magia Żerców, Twierdza*).
+   - **Multiplayer P2P**: bezpośrednie WebRTC przez **PeerJS** oraz matchmaking w sieci **Matrix**.
+   - **Edytor Map**: interaktywne pędzle terenu, stawianie surowców i budynków, generator losowy i eksport/import JSON.
+   - **Edytor Kampanii & Studio Skryptów AI**: edycja misji i testowanie reguł bota w czasie rzeczywistym.
 
-### 5. Edytory wbudowane w silnik
-- **Edytor Map**: Pędzle terenu, stawianie surowców, krów, budynków, generator losowy, eksport i import JSON oraz natychmiastowy przycisk "Przetestuj Mapę".
-- **Edytor Kampanii**: Tworzenie nowych misji, dialogów, celów fabularnych i wyzwalaczy.
-- **Studio Skryptów AI**: Edytor kodu taktycznego w JavaScript z testem składni w czasie rzeczywistym i wgrywaniem do bota.
-
-### 6. Kampania Fabularna "Zjednoczenie Plemion Słowian"
-- Misja 1: *Przebudzenie w Puszczy*
-- Misja 2: *Obrona Świętego Gaju*
-- Misja 3: *Bitwa o Gród Główny*
+5. **Wdrożenie i Repozytorium**:
+   - Projekt zainicjalizowany w Git, skonfigurowany branch `main`, stworzone `README.md` oraz `.gitignore`.
+   - Kod wypchnięty do zdalnego repozytorium GitHub: `https://github.com/nurbsn/SLOWIANIE-RTS`.
 
 ---
 
-## 📁 Struktura Projektu
-- `index.html` – Główny interfejs gry, ekrany i punkt wejścia.
-- `style.css` – Stylizacja w estetyce drewniano-pergaminowej z elementami słowiańskimi.
-- `src/core/` – Pętla gry, kamera, wejście, synteza audio i assety pixel art.
-- `src/world/` – Siatka mapy, surowce, mgła wojny, algorytm A*.
-- `src/entities/` – Klasy jednostek, budynków, pocisków i cząsteczek.
-- `src/gameplay/` – Gracz, selekcja jednostek, drzewko technologii, zaklęcia.
-- `src/ai/` – Kontroler bota, silnik reguł AI, profile zachowań.
-- `src/net/` – Komunikacja WebRTC PeerJS i lobby Matrix.
-- `src/campaign/` – Kampania fabularna, triggery, dialogi.
-- `src/editor/` – Edytor mapy, kampanii i skryptów AI.
-- `src/ui/` – Zarządzanie HUD i ekranami menu.
+## 📋 Otwarte Zadania i Propozycje Rozwoju (Next Steps)
+
+- [ ] Dodanie kolejnych nacji/plemion słowiańskich o unikalnych cechach (np. Wiślanie, Pomorzanie, Dziadoszanie).
+- [ ] Implementacja machin oblężniczych (tarany, katapulty).
+- [ ] Rozszerzenie kampanii o kolejne rozdziały fabularne i animowane przerywniki.
+- [ ] Dodanie efektów pogodowych (deszcz, śnieg, burza piorunowa wpływająca na widoczność i prędkość jednostek).
+- [ ] Wsparcie dla mobilnego sterowania dotykowego (gesty pinch-to-zoom i panel dotykowy).
 
 ---
 
-## 🎮 Jak uruchomić grę
-1. Otwórz plik `index.html` w przeglądarce (np. Chrome, Firefox, Edge, Safari) lub uruchom lokalny serwer HTTP:
-   ```bash
-   npx serve .
-   # lub
-   python -m http.server 8080
-   ```
-2. Wybierz z Menu Głównego:
-   - **Kampania Fabularna** – przejdź kolejne misje fabularne z dialogami i celami.
-   - **Potyczka (Skirmish AI)** – stocz bitwę z botem AI na wybranym poziomie trudności.
-   - **Gra Wieloosobowa** – załóż pokój lub dołącz do innego gracza przez WebRTC.
-   - **Edytory** – zaprojektuj własne mapy, misje i skrypty AI.
+## 🎮 Jak wznowić pracę w nowej sesji
+Użyj polecenia `/wczytaj` w nowej sesji, aby wczytać ten plik i podjąć pracę od bieżącego stanu.
+Gra uruchamia się bezpośrednio przez otwarcie `index.html` lub uruchomienie lokalnego serwera:
+```bash
+npx serve .
+# lub
+python -m http.server 8080
+```
