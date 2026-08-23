@@ -1,9 +1,10 @@
 # Stan Projektu: SŁOWIANIE (Silnik RTS 2D w JS/HTML)
 
 ## 📌 Podsumowanie Projektu
-Projekt **SŁOWIANIE** to kompletny, autonomiczny i modularny silnik strategicznej gry czasu rzeczywistego (RTS 2D) w czystym HTML5 / JavaScript (ES6 Modules), stworzony w hołdzie dla kultowej polskiej gry **Polanie** (1996). 
+Projekt **SŁOWIANIE** to kompletny, autonomiczny i modularny silnik strategicznej gry czasu rzeczywistego (RTS 2D) w czystym HTML5 / JavaScript (ES6 Modules), stworzony w hołdzie dla kultowej polskiej gry **Polanie** (1996).
 
-Silnik nie wymaga zewnętrznych bibliotek budowania (Webpack/Vite/Babel) i działa natychmiast po otwarciu `index.html` w dowolnej nowoczesnej przeglądarce.
+Kod źródłowy projektu został pomyślnie opublikowany w repozytorium GitHub:
+🔗 **[https://github.com/nurbsn/SLOWIANIE-RTS](https://github.com/nurbsn/SLOWIANIE-RTS)**
 
 ---
 
